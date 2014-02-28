@@ -71,17 +71,12 @@ newPathStatus (Win a) (Piece b) =
     then Win a
     else Draw
 
-gameStatus :: Board -> GameStatus
-gameStatus board = gameStatusHelper Unknown pathStatuses
-    where
-        gameStatusHelper :: GameStatus -> [GameStatus] -> GameStatus
-        gameStatusHelper currentStatus [] = currentStatus
-        gameStatusHelper currentStatus (x:xs) =
-            if isFinal currentStatus
-            then currentStatus
-            else gameStatusHelper status xs
-                where status = newGameStatus currentStatus x
-        pathStatuses = map pathStatus (paths board)
+finalGameStatus :: [GameStatus] -> GameStatus
+finalGameStatus statuses =
+    if gameStatus == Unknown
+    then Draw
+    else gameStatus
+        where gameStatus = foldr newGameStatus Unknown statuses
 
 newGameStatus :: GameStatus -> GameStatus -> GameStatus
 newGameStatus Unknown a = a
@@ -93,14 +88,13 @@ newGameStatus a Unfinished = a
 newGameStatus Unfinished a = a
 newGameStatus (Win a) _ = Win a
 
-isFinal :: GameStatus -> Bool
-isFinal (Win _) = True
-isFinal _ = False
+solve :: Board -> GameStatus
+solve board = finalGameStatus (map pathStatus (paths board))
 
-solve :: String -> [GameStatus]
-solve problem = map gameStatus (parseProblem problem)
+solveAll :: String -> [GameStatus]
+solveAll problem = map solve (parseProblem problem)
 
 main :: IO ()
 main = do
     problem <- readFile "example.input"
-    putStr $ Pr.ppShow $ solve problem
+    putStr $ show $ solveAll problem
