@@ -46,18 +46,11 @@ parseProblem :: String -> [Board]
 parseProblem problem = map parseBoard $ sections $ lines problem
 
 pathStatus :: [Square] -> GameStatus
-pathStatus = pathStatusHelper Unknown
-    where
-        pathStatusHelper status [] =
-            if status == Unknown -- all Ts
-            then Draw
-            else status
-        pathStatusHelper status (y:ys) =
-            if nextStatus == Unfinished -- drop out early
-            then Unfinished
-            else pathStatusHelper nextStatus ys
-                where
-                    nextStatus = newStatus status y
+pathStatus squares =
+    if status == Unknown
+    then Draw
+    else status
+        where status = foldl newPathStatus Unknown squares
 
 newPathStatus :: GameStatus -> Square -> GameStatus
 newPathStatus Unfinished _ = Unfinished
