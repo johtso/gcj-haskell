@@ -42,8 +42,8 @@ parseBoard = map (map square)
 sections :: [a] -> [[a]]
 sections xs = map tail $ chunksOf 5 xs
 
-parseProblem :: String -> [Board]
-parseProblem problem = map parseBoard $ sections $ lines problem
+unMarshal :: String -> [Board]
+unMarshal = map parseBoard . sections . lines
 
 pathStatus :: [Square] -> GameStatus
 pathStatus squares =
@@ -84,10 +84,7 @@ newGameStatus (Win a) _ = Win a
 solve :: Board -> GameStatus
 solve board = finalGameStatus (map pathStatus (paths board))
 
-solveAll :: String -> [GameStatus]
-solveAll problem = map solve (parseProblem problem)
-
 main :: IO ()
 main = do
     problem <- readFile "example.input"
-    putStr $ show $ solveAll problem
+    putStr $ show $ map solve (unMarshal problem)
