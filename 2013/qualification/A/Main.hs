@@ -49,16 +49,16 @@ sections xs = map tail $ chunksOf 5 xs
 
 pathStatus :: [Square] -> GameStatus
 pathStatus squares = fromMaybe Draw status
-    where status = foldl newPathStatus Nothing squares
+    where status = foldr newPathStatus Nothing squares
 
-newPathStatus :: Maybe GameStatus -> Square -> Maybe GameStatus
-newPathStatus (Just Unfinished) _ = Just Unfinished
-newPathStatus (Just Draw) _ = Just Draw
-newPathStatus _ Empty = Just Unfinished
-newPathStatus (Just (Win a)) T = Just (Win a)
-newPathStatus Nothing (Piece a) = Just (Win a)
-newPathStatus Nothing T = Nothing
-newPathStatus (Just (Win a)) (Piece b) = Just (if a == b then Win a else Draw)
+newPathStatus :: Square -> Maybe GameStatus -> Maybe GameStatus
+newPathStatus Empty _ = Just Unfinished
+newPathStatus _ (Just Unfinished) = Just Unfinished
+newPathStatus _ (Just Draw) = Just Draw
+newPathStatus T (Just (Win a)) = Just (Win a)
+newPathStatus (Piece a) Nothing = Just (Win a)
+newPathStatus T Nothing = Nothing
+newPathStatus (Piece a) (Just (Win b)) = Just (if a == b then Win a else Draw)
 
 finalGameStatus :: [GameStatus] -> GameStatus
 finalGameStatus = foldr newGameStatus Draw
