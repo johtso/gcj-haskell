@@ -1,11 +1,12 @@
 import Data.List
 import Data.List.Split
+import Data.Maybe
 
 
 data Player = X | O deriving (Eq, Show)
 data Square = Piece Player | T | Empty deriving (Eq, Show)
 type Board = [[Square]]
-data GameStatus = Win Player | Draw | Unfinished | Unknown deriving (Eq, Show)
+data GameStatus = Win Player | Draw | Unfinished deriving (Eq, Show)
 
 
 enumerate :: [a] -> [(Int, a)]
@@ -46,40 +47,31 @@ unMarshal :: String -> [Board]
 unMarshal = map parseBoard . sections . lines
 
 pathStatus :: [Square] -> GameStatus
-pathStatus squares =
-    if status == Unknown
-    then Draw
-    else status
-        where status = foldl newPathStatus Unknown squares
+pathStatus squares = fromMaybe Draw status
+    where status = foldl newPathStatus Nothing squares
 
-newPathStatus :: GameStatus -> Square -> GameStatus
-newPathStatus Unfinished _ = Unfinished
-newPathStatus Draw _ = Draw
-newPathStatus _ Empty = Unfinished
-newPathStatus (Win a) T = Win a
-newPathStatus Unknown (Piece a) = Win a
-newPathStatus Unknown T = Unknown
-newPathStatus (Win a) (Piece b) =
-    if a == b
-    then Win a
-    else Draw
+newPathStatus :: Maybe GameStatus -> Square -> Maybe GameStatus
+newPathStatus (Just Unfinished) _ = Just Unfinished
+newPathStatus (Just Draw) _ = Just Draw
+newPathStatus _ Empty = Just Unfinished
+newPathStatus (Just (Win a)) T = Just (Win a)
+newPathStatus Nothing (Piece a) = Just (Win a)
+newPathStatus Nothing T = Nothing
+newPathStatus (Just (Win a)) (Piece b) = Just (if a == b then Win a else Draw)
 
 finalGameStatus :: [GameStatus] -> GameStatus
-finalGameStatus statuses =
-    if gameStatus == Unknown
-    then Draw
-    else gameStatus
-        where gameStatus = foldr newGameStatus Unknown statuses
+finalGameStatus statuses = fromMaybe Draw gameStatus
+    where gameStatus = foldl newGameStatus Nothing statuses
 
-newGameStatus :: GameStatus -> GameStatus -> GameStatus
-newGameStatus Unknown a = a
-newGameStatus Draw Draw = Draw
-newGameStatus Draw a = a
-newGameStatus Unfinished Draw = Unfinished
-newGameStatus Unfinished Unfinished = Unfinished
+newGameStatus :: Maybe GameStatus -> GameStatus -> Maybe GameStatus
+newGameStatus Nothing a = Just a
+newGameStatus (Just Draw) Draw = Just Draw
+newGameStatus (Just Draw) a = Just a
+newGameStatus (Just Unfinished) Draw = Just Unfinished
+newGameStatus (Just Unfinished) Unfinished = Just Unfinished
 newGameStatus a Unfinished = a
-newGameStatus Unfinished a = a
-newGameStatus (Win a) _ = Win a
+newGameStatus (Just Unfinished) a = Just a
+newGameStatus (Just (Win a)) _ = Just (Win a)
 
 solve :: Board -> GameStatus
 solve board = finalGameStatus (map pathStatus (paths board))
