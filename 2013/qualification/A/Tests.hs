@@ -13,7 +13,11 @@ pathStatusTests :: Test
 pathStatusTests = makeTests pathStatus [
     ([Empty, Empty, Empty],       Unfinished),
     ([Empty, Piece X, Empty],     Unfinished),
-    ([Piece X, Piece X, Piece X], Win X)
+    ([Piece X, Piece X, Piece X], Win X),
+    ([Piece X, T, Piece X],       Win X),
+    ([T, T, Piece X],             Win X),
+    ([T, T, T],                   Draw),
+    ([Piece X, Piece X, Piece O], Draw)
     ]
 
 finalGameStatusTests :: Test
