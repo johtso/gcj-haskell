@@ -1,6 +1,7 @@
 import Data.List
 import Data.List.Split
 import Data.Maybe
+import Text.Printf
 
 
 data Player = X | O deriving (Eq, Show)
@@ -9,8 +10,11 @@ type Board = [[Square]]
 data GameStatus = Win Player | Draw | Unfinished deriving (Eq, Show)
 
 
+enumerateFrom :: Int -> [a] -> [(Int, a)]
+enumerateFrom n = zip [n..]
+
 enumerate :: [a] -> [(Int, a)]
-enumerate = zip [0..]
+enumerate = enumerateFrom 0
 
 mapApply :: [a -> b] -> a -> [b]
 mapApply fs x = map ($x) fs
@@ -43,9 +47,6 @@ parseBoard = map (map square)
 sections :: [a] -> [[a]]
 sections xs = map tail $ chunksOf 5 xs
 
-unMarshal :: String -> [Board]
-unMarshal = map parseBoard . sections . lines
-
 pathStatus :: [Square] -> GameStatus
 pathStatus squares = fromMaybe Draw status
     where status = foldl newPathStatus Nothing squares
@@ -71,7 +72,16 @@ newGameStatus Unfinished a = a
 solve :: Board -> GameStatus
 solve board = finalGameStatus (map pathStatus (paths board))
 
+unMarshal :: [String] -> [Board]
+unMarshal = map parseBoard . sections
+
+caseLine :: Int -> GameStatus -> String
+caseLine n status = printf "Case #%d: %s" n (show status)
+
+marshal :: [GameStatus] -> [String]
+marshal statuses = map (uncurry caseLine) $ enumerateFrom 1 statuses
+
 main :: IO ()
 main = do
     problem <- readFile "example.input"
-    putStr $ show $ map solve (unMarshal problem)
+    putStr $ unlines . marshal . map solve . unMarshal . lines $ problem
