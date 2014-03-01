@@ -60,18 +60,13 @@ newPathStatus Nothing T = Nothing
 newPathStatus (Just (Win a)) (Piece b) = Just (if a == b then Win a else Draw)
 
 finalGameStatus :: [GameStatus] -> GameStatus
-finalGameStatus statuses = fromMaybe Draw gameStatus
-    where gameStatus = foldl newGameStatus Nothing statuses
+finalGameStatus = foldr newGameStatus Draw
 
-newGameStatus :: Maybe GameStatus -> GameStatus -> Maybe GameStatus
-newGameStatus Nothing a = Just a
-newGameStatus (Just Draw) Draw = Just Draw
-newGameStatus (Just Draw) a = Just a
-newGameStatus (Just Unfinished) Draw = Just Unfinished
-newGameStatus (Just Unfinished) Unfinished = Just Unfinished
-newGameStatus a Unfinished = a
-newGameStatus (Just Unfinished) a = Just a
-newGameStatus (Just (Win a)) _ = Just (Win a)
+newGameStatus :: GameStatus -> GameStatus -> GameStatus
+newGameStatus (Win a) _ = Win a
+newGameStatus Draw a = a
+newGameStatus Unfinished Draw = Unfinished
+newGameStatus Unfinished a = a
 
 solve :: Board -> GameStatus
 solve board = finalGameStatus (map pathStatus (paths board))
