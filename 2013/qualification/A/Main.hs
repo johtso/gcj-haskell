@@ -83,5 +83,5 @@ marshal statuses = map (uncurry caseLine) $ enumerateFrom 1 statuses
 
 main :: IO ()
 main = do
-    problem <- readFile "example.input"
-    putStr $ unlines . marshal . map solve . unMarshal . lines $ problem
+    input <- getContents
+    putStr $ unlines . marshal . map solve . unMarshal . lines $ input
