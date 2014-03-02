@@ -1,18 +1,24 @@
-import Test.HUnit
+module Tests where
 
-import Main
+import Test.Framework (defaultMain, testGroup, Test, TestName)
+import Test.Framework.Providers.HUnit (testCase)
+
+import Test.HUnit hiding (Test)
+
+import Main hiding (main)
 
 
-makeTest :: (Eq b, Show b) => (a -> b) -> (a, b) -> Test
-makeTest f (a, b) = TestCase (assertEqual "" b (f a))
+makeTest :: (Eq b, Show a, Show b) => (a -> b) -> (a, b) -> Test
+makeTest f (a, b) = testCase (show a ++ " -> " ++ show b) (assertEqual "" b (f a))
 
-makeTests :: (Eq b, Show b) => (a -> b) -> [(a, b)] -> Test
-makeTests f caseData = TestList $ map (makeTest f) caseData
+makeTests :: (Eq b, Show a, Show b) => TestName -> (a -> b) -> [(a, b)] -> Test
+makeTests name f caseData = testGroup name $ map (makeTest f) caseData
 
 pathStatusTests :: Test
-pathStatusTests = makeTests pathStatus [
+pathStatusTests = makeTests "pathStatus" pathStatus [
     ([Empty, Empty, Empty],       Unfinished),
     ([Empty, Piece X, Empty],     Unfinished),
+    ([Piece X, Piece O, Empty],   Unfinished),
     ([Piece X, Piece X, Piece X], Win X),
     ([Piece X, T, Piece X],       Win X),
     ([T, T, Piece X],             Win X),
@@ -21,15 +27,15 @@ pathStatusTests = makeTests pathStatus [
     ]
 
 finalGameStatusTests :: Test
-finalGameStatusTests = makeTests finalGameStatus [
+finalGameStatusTests = makeTests "finalGameStatus" finalGameStatus [
     ([Win X, Unfinished],      Win X),
     ([Win X, Win O],           Win X),
     ([Unfinished, Unfinished], Unfinished),
     ([Win X, Draw],            Win X)
     ]
 
-allTests :: Test
-allTests = TestList [pathStatusTests, finalGameStatusTests]
+allTests :: [Test]
+allTests = [pathStatusTests, finalGameStatusTests]
 
-main :: IO Counts
-main = runTestTT allTests
+main :: IO ()
+main = defaultMain allTests
