@@ -82,6 +82,4 @@ marshal :: [GameStatus] -> [String]
 marshal statuses = map (uncurry caseLine) $ enumerateFrom 1 statuses
 
 main :: IO ()
-main = do
-    input <- getContents
-    putStr $ unlines . marshal . map solve . unMarshal . lines $ input
+main = interact $ unlines . marshal . map solve . unMarshal . lines
