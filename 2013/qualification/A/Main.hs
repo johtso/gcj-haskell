@@ -31,18 +31,18 @@ mainDiagonal xss = [xs!!n | (n, xs) <- enumerate xss]
 minorDiagonal :: [[a]] -> [a]
 minorDiagonal xss = mainDiagonal (map reverse xss)
 
-paths :: [[a]] -> [[a]]
-paths = concatMapApply [id, transpose, diagonals]
+pathsThroughGrid :: [[a]] -> [[a]]
+pathsThroughGrid = concatMapApply [id, transpose, diagonals]
 
-square :: Char -> Square
-square 'X' = Piece X
-square 'O' = Piece O
-square 'T' = T
-square '.' = Empty
-square a = error $ "Unknown board character: " ++ [a]
+charToSquare :: Char -> Square
+charToSquare 'X' = Piece X
+charToSquare 'O' = Piece O
+charToSquare 'T' = T
+charToSquare '.' = Empty
+charToSquare a = error $ "Unknown board character: " ++ [a]
 
 parseBoard :: [String] -> [[Square]]
-parseBoard = map (map square)
+parseBoard = map (map charToSquare)
 
 sections :: [a] -> [[a]]
 sections xs = map tail $ chunksOf 5 xs
@@ -70,7 +70,7 @@ newGameStatus Unfinished Draw = Unfinished
 newGameStatus Unfinished a = a
 
 solve :: Board -> GameStatus
-solve board = finalGameStatus (map pathStatus (paths board))
+solve board = finalGameStatus (map pathStatus (pathsThroughGrid board))
 
 unMarshal :: [String] -> [Board]
 unMarshal = map parseBoard . sections
