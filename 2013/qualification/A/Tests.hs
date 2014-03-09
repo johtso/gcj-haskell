@@ -16,6 +16,10 @@ makeTests name f caseData = testGroup name $ map (makeTest f) caseData
 
 pathStatusTests :: TestTree
 pathStatusTests = makeTests "pathStatus" pathStatus [
+    ([Piece X],                   Win X),
+    ([Piece O],                   Win O),
+    ([T],                         Draw),
+    ([Empty],                     Unfinished),
     ([Empty, Empty, Empty],       Unfinished),
     ([Empty, Piece X, Empty],     Unfinished),
     ([Piece X, Piece O, Empty],   Unfinished),
@@ -31,6 +35,7 @@ finalGameStatusTests = makeTests "finalGameStatus" finalGameStatus [
     ([Win X, Unfinished],      Win X),
     ([Win X, Win O],           Win X),
     ([Unfinished, Unfinished], Unfinished),
+    ([Unfinished, Draw],       Unfinished),
     ([Win X, Draw],            Win X)
     ]
 
