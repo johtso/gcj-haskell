@@ -4,10 +4,10 @@ import Data.Maybe
 import Text.Printf
 
 
-data Player = X | O deriving (Eq, Show)
-data Square = Piece Player | T | Empty deriving (Eq, Show)
+data Player = X | O deriving (Eq, Ord, Show)
+data Square = Piece Player | T | Empty deriving (Eq, Ord, Show)
 type Board = [[Square]]
-data GameStatus = Win Player | Draw | Unfinished deriving (Eq, Show)
+data GameStatus = Win Player | Draw | Unfinished deriving (Eq, Ord, Show)
 
 
 enumerateFrom :: Int -> [a] -> [(Int, a)]
