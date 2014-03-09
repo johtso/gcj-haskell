@@ -1,20 +1,20 @@
 module Tests where
 
-import Test.Framework (defaultMain, testGroup, Test, TestName)
-import Test.Framework.Providers.HUnit (testCase)
+import Test.Tasty
+import Test.Tasty.HUnit
+import Test.Tasty.QuickCheck
 
-import Test.HUnit hiding (Test)
 
 import Main hiding (main)
 
 
-makeTest :: (Eq b, Show a, Show b) => (a -> b) -> (a, b) -> Test
+makeTest :: (Eq a1, Show a1, Show a) => (a -> a1) -> (a, a1) -> TestTree
 makeTest f (a, b) = testCase (show a ++ " -> " ++ show b) (assertEqual "" b (f a))
 
-makeTests :: (Eq b, Show a, Show b) => TestName -> (a -> b) -> [(a, b)] -> Test
+makeTests :: (Eq a1, Show a, Show a1) => TestName -> (a -> a1) -> [(a, a1)] -> TestTree
 makeTests name f caseData = testGroup name $ map (makeTest f) caseData
 
-pathStatusTests :: Test
+pathStatusTests :: TestTree
 pathStatusTests = makeTests "pathStatus" pathStatus [
     ([Empty, Empty, Empty],       Unfinished),
     ([Empty, Piece X, Empty],     Unfinished),
@@ -26,7 +26,7 @@ pathStatusTests = makeTests "pathStatus" pathStatus [
     ([Piece X, Piece X, Piece O], Draw)
     ]
 
-finalGameStatusTests :: Test
+finalGameStatusTests :: TestTree
 finalGameStatusTests = makeTests "finalGameStatus" finalGameStatus [
     ([Win X, Unfinished],      Win X),
     ([Win X, Win O],           Win X),
@@ -34,8 +34,8 @@ finalGameStatusTests = makeTests "finalGameStatus" finalGameStatus [
     ([Win X, Draw],            Win X)
     ]
 
-allTests :: [Test]
-allTests = [pathStatusTests, finalGameStatusTests]
+allTests :: TestTree
+allTests = testGroup "Tests" [pathStatusTests, finalGameStatusTests]
 
 main :: IO ()
 main = defaultMain allTests
