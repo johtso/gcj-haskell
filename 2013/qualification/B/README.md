@@ -1,4 +1,4 @@
-Problem
+###Problem
 
 Alice and Bob have a lawn in front of their house, shaped like an N metre by M metre rectangle. Each year, they try to cut the lawn in some interesting pattern. They used to do their cutting with shears, which was very time-consuming; but now they have a new automatic lawnmower with multiple settings, and they want to try it out.
 
@@ -8,15 +8,15 @@ Alice and Bob have a number of various patterns of grass that they could have on
 
 The grass is initially 100mm high on the whole lawn.
 
-Input
+###Input
 
 The first line of the input gives the number of test cases, T. T test cases follow. Each test case begins with a line containing two integers: N and M. Next follow N lines, with the ith line containing M integers ai,j each, the number ai,j describing the desired height of the grass in the jth square of the ith row.
 
-Output
+###Output
 
 For each test case, output one line containing "Case #x: y", where x is the case number (starting from 1) and y is either the word "YES" if it's possible to get the x-th pattern using the lawnmower, or "NO", if it's impossible (quotes for clarity only).
 
-Limits
+###Limits
 
 1 ≤ T ≤ 100.
 
@@ -24,6 +24,7 @@ Small dataset
 
 1 ≤ N, M ≤ 10.
 1 ≤ ai,j ≤ 2.
+
 Large dataset
 
 1 ≤ N, M ≤ 100.
